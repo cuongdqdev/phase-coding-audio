@@ -27,7 +27,7 @@
             <h3 class="text-muted">Nhóm 9</h3>
         </div>
         <!-- start audio to encode -->
-        <h4>Tải lên file audio</h4>
+        <h4>Tải lên file audio (Only wav)</h4>
         <form id="data" method="PORT" enctype="multipart/form-data">
             <input type="file" id="encodeFile" name="file" />
             <audio id="loadSrcEndcodeFile" controls>
@@ -44,7 +44,7 @@
             <button class="btn btn-success" id="btnEncode">Encode </button>
 
         </form>
-
+        <br />
         <p id='txtResult'>
 
         </p>
@@ -74,9 +74,8 @@
                 type: 'POST',
                 data: formData,
                 success: function (resp) {
-                    alert('Test')
-                    console.log(resp.data)
-                    $('#txtResult').append('Testing')
+                    let fileName = resp.data
+                    $('#txtResult').append('Chọn vào đây để tải Audio: ' + `<a href='/downloadFile/${fileName}' target='blank'>Tải Audio</a>` )
                     toastr.success('Encode thành công', 'Nhóm 9')
                 },
                 cache: false,

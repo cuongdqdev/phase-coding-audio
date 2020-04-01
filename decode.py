@@ -2,8 +2,8 @@ import numpy as np
 import scipy as sp
 import scipy.io.wavfile
 
-fname = 'steg_file_example_WAV_5MG.wav'
-msg = 'Dang Quoc Cuong testing'
+fname = 'steg_encodingAudio.wav'
+msg = 'Dang Quoc Cuong 123456789'
 msgLength = len(msg)
 print(msgLength)
 

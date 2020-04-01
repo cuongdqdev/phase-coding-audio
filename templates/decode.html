@@ -36,15 +36,15 @@
             <!-- end audio to encode -->
             <br /> <br />
             <!-- start secret message -->
-            <h4>Tin nhắn secret</h4>
+            <h4>Độ dài tin nhắn secret</h4>
             <div class="form-group">
-                <textarea class="form-control" rows="5" id="comment" name="secret"></textarea>
+                <input class="form-control" name="secret" type="number" style="width: 200px;" />
             </div>
             <!-- end secret message -->
             <button class="btn btn-success" id="btnDecode">Decode</button>
 
         </form>
-
+        <br />
         <p id='txtResult'>
 
         </p>
@@ -65,7 +65,7 @@
             document.getElementById("loadSrcDecodeFile").load();
         }
         document.getElementById("decodeFile").addEventListener("change", handleDecodeFile, false);
-       
+
         $("form#data").submit(function (e) {
             e.preventDefault();
             let formData = new FormData(this);
@@ -74,9 +74,17 @@
                 type: 'POST',
                 data: formData,
                 success: function (resp) {
-                    alert('Test')
-                    console.log(resp)
-                    $('#txtResult').append('Testing')
+                    let data = resp.data;
+                    $('#txtResult').empty();
+                    let result = `<span>Kết quả tìm được: ${data.length}</span> <br /> `;
+                    data.forEach((item, index) => {
+                        result += ` <span>Kết quả: ${index + 1} </span>
+                                    <div class="form-group">
+                                        <textarea class="form-control" rows="5">${item}</textarea>
+                                    </div>`
+                    });
+
+                    $('#txtResult').append(result)
                     toastr.success('Decode thành công', 'Nhóm 9')
                 },
                 cache: false,
