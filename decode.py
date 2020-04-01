@@ -3,21 +3,27 @@ import scipy as sp
 import scipy.io.wavfile
 
 fname = 'steg_file_example_WAV_5MG.wav'
+msg = 'Dang Quoc Cuong testing'
+msgLength = len(msg)
+print(msgLength)
 
-rate, channels = sp.io.wavfile.read(fname)
-channels = channels.copy()
-rate, channels.shape
+def decode(fname, msgLength):
 
-msglen = 8 * 4
-seglen = 2*int(2**np.ceil(np.log2(2*msglen)))
-segmid = seglen // 2
+    rate, channels = sp.io.wavfile.read(fname)
+    channels = channels.copy()
+    rate, channels.shape
 
-if len(channels.shape) == 1:
-    x = channels[:seglen]
-else:
-    x = channels[:seglen,0]
-x = (np.angle(np.fft.fft(x))[segmid-msglen:segmid] < 0).astype(np.int8)
-x = x.reshape((-1,8)).dot(1 << np.arange(8 - 1, -1, -1))
-''.join(np.char.mod('%c',x))
+    msglen = 8 * msgLength
+    seglen = 2*int(2**np.ceil(np.log2(2*msglen)))
+    segmid = seglen // 2
 
-print(''.join(np.char.mod('%c',x)))
+    if len(channels.shape) == 1:
+        x = channels[:seglen]
+    else:
+        x = channels[:seglen,0]
+    x = (np.angle(np.fft.fft(x))[segmid-msglen:segmid] < 0).astype(np.int8)
+    x = x.reshape((-1,8)).dot(1 << np.arange(8 - 1, -1, -1))
+    ''.join(np.char.mod('%c',x))
+    return ''.join(np.char.mod('%c',x))
+
+print(decode(fname, msgLength))
