@@ -60,10 +60,10 @@
                     </li>
                 </ul>
             </nav>
-            <h3 class="text-muted">Nhóm 9</h3>
+            <h3 class="text-muted">Group 9</h3>
         </div>
         <!-- start audio to encode -->
-        <h4>Tải lên file audio</h4>
+        <h4>Upload audio file</h4>
         <form id="data" method="PORT" enctype="multipart/form-data">
             <input type="file" id="encodeFile" name="file" />
             <audio id="loadSrcEndcodeFile" controls>
@@ -72,7 +72,7 @@
             <!-- end audio to encode -->
             <br /> <br />
             <!-- start secret message -->
-            <h4>Tin nhắn secret</h4>
+            <h4>Secret message</h4>
             <div class="form-group">
                 <textarea class="form-control" rows="5" id="txtSecret" name="secret"></textarea>
             </div>
@@ -105,39 +105,63 @@
             document.getElementById("loadSrcEndcodeFile").load();
         }
         document.getElementById("encodeFile").addEventListener("change", handleEncodeFile, false);
+        // handle input 
+        $(document).ready(function () {
+            $("#txtSecret").keypress(function (event) {
+                let ew = event.which;
+                if (ew == 32)
+                    return true;
+                if (48 <= ew && ew <= 57)
+                    return true;
+                if (65 <= ew && ew <= 90)
+                    return true;
+                if (97 <= ew && ew <= 122)
+                    return true;
+                return false;
+            });
 
-        $("form#data").submit(function (e) {
-            e.preventDefault();
+            // handle encode
+            $("form#data").submit(function (e) {
+                e.preventDefault();
+                let secretMsg = $('#txtSecret').val();
+                if (!$('#encodeFile').val()) {
+                    return swal("Oops...", "Please upload audio file!", "error");
+                }
+                let reg = /(.*?)\.(wav)$/;
+                if (!$('#encodeFile').val().match(reg)) {
+                    return swal("Oops...", "Please upload only wav file!", "error");
+                }
+                if (!secretMsg) {
+                    return swal("Oops...", "Please enter secret message!", "error");
+                }
+                if (secretMsg.length > 10) {
+                    return swal("Oops...", "Please enter secret message length < 1000!", "error");
+                }
+                let regex = /[^a-z0-9A-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]/;
+                if (secretMsg.match(regex)) {
+                    return swal("Oops...", "Please enter A - Z, a-z and 0 - 9!", "error");
+                }
 
-            if (!$('#encodeFile').val()) {
-                return swal("Oops...", "Vui lòng tải file Audio", "error");
-            }
-            let reg = /(.*?)\.(wav)$/;
-            if (!$('#encodeFile').val().match(reg)) {
-                return swal("Oops...", "Vui lòng chỉ tải file wav", "error");
-            }
-            if (!$('#txtSecret').val()) {
-                return swal("Oops...", "Vui lòng nhập tin nhắn Secret", "error");
-            }
-            
-            let formData = new FormData(this);
-            document.getElementById("btnLoader").style.display = "block";
-            $.ajax({
-                url: '/handleEncode',
-                type: 'POST',
-                data: formData,
-                success: function (resp) {
-                    $('#txtResult').empty();
-                    let fileName = resp.data;
-                    document.getElementById("btnLoader").style.display = "none";
-                    $('#txtResult').append('Chọn vào đây để tải Audio: ' + `<a href='/downloadFile/${fileName}' target='blank'>Tải Audio</a>`)
-                    toastr.success('Encode thành công', 'Thông báo')
-                },
-                cache: false,
-                contentType: false,
-                processData: false
+                let formData = new FormData(this);
+                document.getElementById("btnLoader").style.display = "block";
+                $.ajax({
+                    url: '/handleEncode',
+                    type: 'POST',
+                    data: formData,
+                    success: function (resp) {
+                        $('#txtResult').empty();
+                        let fileName = resp.data;
+                        document.getElementById("btnLoader").style.display = "none";
+                        $('#txtResult').append('Click here to download audio file: ' + `<a href='/downloadFile/${fileName}' target='blank'>Download Audio</a>`)
+                        toastr.success('Encode successfully', 'Notification')
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
             });
         });
+
     </script>
 </body>
 

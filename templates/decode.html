@@ -60,10 +60,10 @@
                     </li>
                 </ul>
             </nav>
-            <h3 class="text-muted">Nhóm 9</h3>
+            <h3 class="text-muted">Group 9</h3>
         </div>
         <!-- start audio to encode -->
-        <h4>Tải lên file audio</h4>
+        <h4>Upload audio file</h4>
         <form id="data" method="PORT" enctype="multipart/form-data">
             <input type="file" id="decodeFile" name="file" />
             <audio id="loadSrcDecodeFile" controls>
@@ -72,7 +72,7 @@
             <!-- end audio to encode -->
             <br /> <br />
             <!-- start secret message -->
-            <h4>Độ dài tin nhắn secret</h4>
+            <h4>Secret message length</h4>
             <div class="form-group">
                 <input class="form-control" id="txtSecretLength" name="secret" type="number" style="width: 200px;" />
             </div>
@@ -106,43 +106,51 @@
             document.getElementById("loadSrcDecodeFile").load();
         }
         document.getElementById("decodeFile").addEventListener("change", handleDecodeFile, false);
-
-        $("form#data").submit(function (e) {
-            e.preventDefault();
-            
-            if (!$('#decodeFile').val()) {
-                return swal("Oops...", "Vui lòng tải file Audio", "error");
-            }
-            let reg = /(.*?)\.(wav)$/;
-            if (!$('#decodeFile').val().match(reg)) {
-                return swal("Oops...", "Vui lòng chỉ tải file wav", "error");
-            }
-            if (!$('#txtSecretLength').val()) {
-                return swal("Oops...", "Vui lòng nhập độ dài tin nhắn Secret", "error");
-            }
-            let formData = new FormData(this);
-            document.getElementById("btnLoader").style.display = "block";
-            $.ajax({
-                url: '/handleDecode',
-                type: 'POST',
-                data: formData,
-                success: function (resp) {
-                    let data = resp.data;
-                    $('#txtResult').empty();
-                    let result = `<span>Kết quả tìm được: ${data.length}</span> <br /> `;
-                    data.forEach((item, index) => {
-                        result += ` <span>Kết quả: ${index + 1} </span>
+        $(document).ready(function () {
+            // handle decode
+            $("form#data").submit(function (e) {
+                e.preventDefault();
+                let secretLength = parseInt($('#txtSecretLength').val());
+                if (!$('#decodeFile').val()) {
+                    return swal("Oops...", "Please upload audio file!", "error");
+                }
+                let reg = /(.*?)\.(wav)$/;
+                if (!$('#decodeFile').val().match(reg)) {
+                    return swal("Oops...", "Please upload only wav file!", "error");
+                }
+                if (!secretLength) {
+                    return swal("Oops...", "Please enter secret message length!", "error");
+                }
+                if (!Number.isInteger(secretLength)) {
+                    return swal("Oops...", "Please enter integer number!", "error");
+                }
+                if (secretLength <= 5 || secretLength > 2000) {
+                    return swal("Oops...", "Please enter integer number from 5 to 2000!", "error");
+                }
+                let formData = new FormData(this);
+                document.getElementById("btnLoader").style.display = "block";
+                $.ajax({
+                    url: '/handleDecode',
+                    type: 'POST',
+                    data: formData,
+                    success: function (resp) {
+                        let data = resp.data;
+                        $('#txtResult').empty();
+                        let result = `<span>Total Results: ${data.length}</span> <br /> `;
+                        data.forEach((item, index) => {
+                            result += ` <span>Result: ${index + 1} </span>
                                     <div class="form-group">
                                         <textarea class="form-control" rows="5">${item}</textarea>
                                     </div>`
-                    });
-                    document.getElementById("btnLoader").style.display = "none";
-                    $('#txtResult').append(result)
-                    toastr.success('Decode thành công', 'Thông báo')
-                },
-                cache: false,
-                contentType: false,
-                processData: false
+                        });
+                        document.getElementById("btnLoader").style.display = "none";
+                        $('#txtResult').append(result)
+                        toastr.success('Decode successfully', 'Notification')
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
             });
         });
     </script>
