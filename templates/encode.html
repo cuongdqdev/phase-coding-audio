@@ -10,6 +10,42 @@
 
 </head>
 
+<style>
+    #btnLoader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid blue;
+        border-right: 16px solid green;
+        border-bottom: 16px solid red;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        /* Safari */
+        animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
 <body>
 
     <div class="container">
@@ -27,7 +63,7 @@
             <h3 class="text-muted">Nhóm 9</h3>
         </div>
         <!-- start audio to encode -->
-        <h4>Tải lên file audio (Only wav)</h4>
+        <h4>Tải lên file audio</h4>
         <form id="data" method="PORT" enctype="multipart/form-data">
             <input type="file" id="encodeFile" name="file" />
             <audio id="loadSrcEndcodeFile" controls>
@@ -38,12 +74,14 @@
             <!-- start secret message -->
             <h4>Tin nhắn secret</h4>
             <div class="form-group">
-                <textarea class="form-control" rows="5" id="comment" name="secret"></textarea>
+                <textarea class="form-control" rows="5" id="txtSecret" name="secret"></textarea>
             </div>
             <!-- end secret message -->
             <button class="btn btn-success" id="btnEncode">Encode </button>
 
         </form>
+        <br />
+        <div style="display:none;" id="btnLoader"></div>
         <br />
         <p id='txtResult'>
 
@@ -58,6 +96,8 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
     <script>
         function handleEncodeFile(event) {
             var files = event.target.files;
@@ -65,18 +105,33 @@
             document.getElementById("loadSrcEndcodeFile").load();
         }
         document.getElementById("encodeFile").addEventListener("change", handleEncodeFile, false);
-       
+
         $("form#data").submit(function (e) {
             e.preventDefault();
+
+            if (!$('#encodeFile').val()) {
+                return swal("Oops...", "Vui lòng tải file Audio", "error");
+            }
+            let reg = /(.*?)\.(wav)$/;
+            if (!$('#encodeFile').val().match(reg)) {
+                return swal("Oops...", "Vui lòng chỉ tải file wav", "error");
+            }
+            if (!$('#txtSecret').val()) {
+                return swal("Oops...", "Vui lòng nhập tin nhắn Secret", "error");
+            }
+            
             let formData = new FormData(this);
+            document.getElementById("btnLoader").style.display = "block";
             $.ajax({
                 url: '/handleEncode',
                 type: 'POST',
                 data: formData,
                 success: function (resp) {
-                    let fileName = resp.data
-                    $('#txtResult').append('Chọn vào đây để tải Audio: ' + `<a href='/downloadFile/${fileName}' target='blank'>Tải Audio</a>` )
-                    toastr.success('Encode thành công', 'Nhóm 9')
+                    $('#txtResult').empty();
+                    let fileName = resp.data;
+                    document.getElementById("btnLoader").style.display = "none";
+                    $('#txtResult').append('Chọn vào đây để tải Audio: ' + `<a href='/downloadFile/${fileName}' target='blank'>Tải Audio</a>`)
+                    toastr.success('Encode thành công', 'Thông báo')
                 },
                 cache: false,
                 contentType: false,

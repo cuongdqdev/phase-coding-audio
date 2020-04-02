@@ -10,6 +10,42 @@
 
 </head>
 
+<style>
+    #btnLoader {
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid blue;
+        border-right: 16px solid green;
+        border-bottom: 16px solid red;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite;
+        /* Safari */
+        animation: spin 2s linear infinite;
+    }
+
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% {
+            -webkit-transform: rotate(0deg);
+        }
+
+        100% {
+            -webkit-transform: rotate(360deg);
+        }
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+</style>
+
 <body>
 
     <div class="container">
@@ -38,12 +74,14 @@
             <!-- start secret message -->
             <h4>Độ dài tin nhắn secret</h4>
             <div class="form-group">
-                <input class="form-control" name="secret" type="number" style="width: 200px;" />
+                <input class="form-control" id="txtSecretLength" name="secret" type="number" style="width: 200px;" />
             </div>
             <!-- end secret message -->
             <button class="btn btn-success" id="btnDecode">Decode</button>
 
         </form>
+        <br />
+        <div style="display:none;" id="btnLoader"></div>
         <br />
         <p id='txtResult'>
 
@@ -58,6 +96,9 @@
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+
+
     <script>
         function handleDecodeFile(event) {
             var files = event.target.files;
@@ -68,7 +109,19 @@
 
         $("form#data").submit(function (e) {
             e.preventDefault();
+            
+            if (!$('#decodeFile').val()) {
+                return swal("Oops...", "Vui lòng tải file Audio", "error");
+            }
+            let reg = /(.*?)\.(wav)$/;
+            if (!$('#decodeFile').val().match(reg)) {
+                return swal("Oops...", "Vui lòng chỉ tải file wav", "error");
+            }
+            if (!$('#txtSecretLength').val()) {
+                return swal("Oops...", "Vui lòng nhập độ dài tin nhắn Secret", "error");
+            }
             let formData = new FormData(this);
+            document.getElementById("btnLoader").style.display = "block";
             $.ajax({
                 url: '/handleDecode',
                 type: 'POST',
@@ -83,9 +136,9 @@
                                         <textarea class="form-control" rows="5">${item}</textarea>
                                     </div>`
                     });
-
+                    document.getElementById("btnLoader").style.display = "none";
                     $('#txtResult').append(result)
-                    toastr.success('Decode thành công', 'Nhóm 9')
+                    toastr.success('Decode thành công', 'Thông báo')
                 },
                 cache: false,
                 contentType: false,
