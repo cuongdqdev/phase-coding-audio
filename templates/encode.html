@@ -134,8 +134,8 @@
                 if (!secretMsg) {
                     return swal("Oops...", "Please enter secret message!", "error");
                 }
-                if (secretMsg.length > 10) {
-                    return swal("Oops...", "Please enter secret message length < 1000!", "error");
+                if (secretMsg.length > 2000) {
+                    return swal("Oops...", "Please enter secret message length < 2000!", "error");
                 }
                 let regex = /[^a-z0-9A-Z_ÀÁÂÃÈÉÊÌÍÒÓÔÕÙÚĂĐĨŨƠàáâãèéêìíòóôõùúăđĩũơƯĂẠẢẤẦẨẪẬẮẰẲẴẶẸẺẼỀỀỂưăạảấầẩẫậắằẳẵặẹẻẽềềểỄỆỈỊỌỎỐỒỔỖỘỚỜỞỠỢỤỦỨỪễệỉịọỏốồổỗộớờởỡợụủứừỬỮỰỲỴÝỶỸửữựỳỵỷỹ]/;
                 if (secretMsg.match(regex)) {
